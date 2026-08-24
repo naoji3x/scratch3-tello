@@ -63,6 +63,11 @@ const message = {
         'ja-Hira': 'さいごにとったしゃしんのファイルパス',
         'en': 'last photo file path',
     },
+    led: {
+        'ja': 'LEDを 赤:[R] 緑:[G] 青:[B] にする',
+        'ja-Hira': 'LEDを あか:[R] みどり:[G] あお:[B] にする',
+        'en': 'set LED red:[R] green:[G] blue:[B]',
+    },
     takeoff: {
         'ja': '離陸する',
         'ja-Hira': 'りりくする',
@@ -618,6 +623,25 @@ class Scratch3Tello {
                     opcode: 'lastPhotoPath',
                     text: this._getText('lastPhotoPath'),
                     blockType: BlockType.REPORTER
+                },
+                {
+                    opcode: 'led',
+                    text: this._getText('led'),
+                    blockType: BlockType.COMMAND,
+                    arguments: {
+                        R: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 255
+                        },
+                        G: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 0
+                        },
+                        B: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 0
+                        }
+                    }
                 },
                 '---',
                 {
@@ -1271,6 +1295,14 @@ class Scratch3Tello {
 
     lastPhotoPath () {
         return this._lastPhotoPath;
+    }
+
+    led (args) {
+        const clamp = value => Math.max(0, Math.min(255, Math.round(Cast.toNumber(value))));
+        const r = clamp(args.R);
+        const g = clamp(args.G);
+        const b = clamp(args.B);
+        this.telloProcessor.request(`EXT led ${r} ${g} ${b}`);
     }
 
     pitch () {

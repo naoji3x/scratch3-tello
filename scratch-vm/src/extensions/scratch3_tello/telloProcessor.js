@@ -101,9 +101,11 @@ class TelloProcessor {
 
     send (cmd) {
         const msg = Buffer.from(cmd);
-        // While grounding, `command`, `mon`, `mdirection 2`, `takeoff`, `streamon` and `streamoff` are only executable
+        // While grounding, `command`, `mon`, `mdirection 2`, `takeoff`, `streamon`, `streamoff`
+        // and `EXT led ...` (RoboMaster TT LED) are only executable
         const groundedAllowedCommands = ['command', 'mon', 'mdirection 2', 'takeoff', 'streamon', 'streamoff'];
-        if (!this.flying && !groundedAllowedCommands.includes(cmd)) {
+        const isGroundedAllowed = groundedAllowedCommands.includes(cmd) || cmd.startsWith('EXT led');
+        if (!this.flying && !isGroundedAllowed) {
             this.queue.shift();
             return;
         }
