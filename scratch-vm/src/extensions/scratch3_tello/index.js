@@ -1,9 +1,13 @@
+const os = require('os');
+const path = require('path');
+
 const ArgumentType = require('../../extension-support/argument-type');
 const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const formatMessage = require('format-message');
 
 const TelloProcessor = require('./telloProcessor');
+const TelloVideo = require('./telloVideo');
 
 /**
  * Icon svg to be displayed at the left edge of each extension block, encoded as a data URI.
@@ -33,6 +37,31 @@ const message = {
         'it': 'riconnetti',
         'lv': 'atkārtoti savienot',
         'ua': 'перепідключитися',
+    },
+    videoToggle: {
+        'ja': 'カメラを [VIDEO_STATE] にする',
+        'ja-Hira': 'カメラを [VIDEO_STATE] にする',
+        'en': 'turn camera [VIDEO_STATE]',
+    },
+    videoOn: {
+        'ja': 'オン',
+        'ja-Hira': 'オン',
+        'en': 'on',
+    },
+    videoOff: {
+        'ja': 'オフ',
+        'ja-Hira': 'オフ',
+        'en': 'off',
+    },
+    takePhoto: {
+        'ja': '写真をとる',
+        'ja-Hira': 'しゃしんをとる',
+        'en': 'take photo',
+    },
+    lastPhotoPath: {
+        'ja': '最後に撮った写真のファイルパス',
+        'ja-Hira': 'さいごにとったしゃしんのファイルパス',
+        'en': 'last photo file path',
     },
     takeoff: {
         'ja': '離陸する',
@@ -532,6 +561,9 @@ class Scratch3Tello {
         this.telloProcessor = new TelloProcessor();
         this.telloProcessor.initialize();
 
+        this.telloVideo = new TelloVideo(runtime);
+        this._lastPhotoPath = '';
+
         this.state = {};
         this.getState();
     }
@@ -563,6 +595,29 @@ class Scratch3Tello {
                     text: this._getText('reconnect'),
                     blockType: BlockType.COMMAND,
                     isTerminal: true
+                },
+                '---',
+                {
+                    opcode: 'videoToggle',
+                    text: this._getText('videoToggle'),
+                    blockType: BlockType.COMMAND,
+                    arguments: {
+                        VIDEO_STATE: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'on',
+                            menu: 'VIDEO_STATE'
+                        }
+                    }
+                },
+                {
+                    opcode: 'takePhoto',
+                    text: this._getText('takePhoto'),
+                    blockType: BlockType.COMMAND
+                },
+                {
+                    opcode: 'lastPhotoPath',
+                    text: this._getText('lastPhotoPath'),
+                    blockType: BlockType.REPORTER
                 },
                 '---',
                 {
@@ -925,6 +980,19 @@ class Scratch3Tello {
                 }
             ],
             menus: {
+                VIDEO_STATE: {
+                    acceptReporters: false,
+                    items: [
+                        {
+                            text: this._getText('videoOn'),
+                            value: 'on'
+                        },
+                        {
+                            text: this._getText('videoOff'),
+                            value: 'off'
+                        }
+                    ]
+                },
                 DIRECTION: {
                     acceptReporters: true,
                     items: [
@@ -1174,11 +1242,35 @@ class Scratch3Tello {
     }
 
     reconnect () {
+        this.telloVideo.disable();
         this.telloProcessor.reconnect();
     }
 
     clearQueue () {
         this.telloProcessor.resetQueue();
+    }
+
+    videoToggle (args) {
+        if (args.VIDEO_STATE === 'on') {
+            this.telloProcessor.request('streamon');
+            this.telloVideo.enable();
+        } else {
+            this.telloVideo.disable();
+            this.telloProcessor.request('streamoff');
+        }
+    }
+
+    takePhoto () {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const destPath = path.join(os.homedir(), 'Pictures', 'Tello Photos', `tello-${timestamp}.png`);
+
+        if (this.telloVideo.capturePhoto(destPath)) {
+            this._lastPhotoPath = destPath;
+        }
+    }
+
+    lastPhotoPath () {
+        return this._lastPhotoPath;
     }
 
     pitch () {

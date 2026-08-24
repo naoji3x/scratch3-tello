@@ -6,6 +6,7 @@
 
 /scratch-vm/*
 !/scratch-vm/LICENSE
+!/scratch-vm/package.json
 !/scratch-vm/src
 /scratch-vm/src/*
 !scratch-vm/src/extensions
@@ -29,3 +30,4 @@
 !/scratch-gui/src/lib/libraries/extensions/tello
 
 /scratch-desktop/*
+!/scratch-desktop/electron-builder.yaml

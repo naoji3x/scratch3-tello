@@ -101,8 +101,9 @@ class TelloProcessor {
 
     send (cmd) {
         const msg = Buffer.from(cmd);
-        // While grounding, `command`, `mon`, `mdirection 2` and `takeoff` are only executable
-        if (!this.flying && cmd !== 'command' && cmd !== 'mon' && cmd !== 'mdirection 2' && cmd !== 'takeoff') {
+        // While grounding, `command`, `mon`, `mdirection 2`, `takeoff`, `streamon` and `streamoff` are only executable
+        const groundedAllowedCommands = ['command', 'mon', 'mdirection 2', 'takeoff', 'streamon', 'streamoff'];
+        if (!this.flying && !groundedAllowedCommands.includes(cmd)) {
             this.queue.shift();
             return;
         }
