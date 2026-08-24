@@ -45,7 +45,7 @@ Feel free to create a pull request for adding more languages!
 ```bash
 $ mkdir scratch3-tello
 $ cd scratch3-tello
-$ wget https://raw.githubusercontent.com/kebhr/scratch3-tello/master/build.sh
+$ wget https://raw.githubusercontent.com/naoji3x/scratch3-tello/master/build.sh
 $ chmod +x build.sh
 $ ./build.sh
 ```

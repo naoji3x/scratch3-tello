@@ -23,6 +23,6 @@ rm -rf scratch-gui
 ln -s ../../scratch-gui scratch-gui
 cd ../../
 
-git clone https://github.com/kebhr/scratch3-tello
+git clone https://github.com/naoji3x/scratch3-tello
 cp -r scratch3-tello/. ./
 rm -rf scratch3-tello/
