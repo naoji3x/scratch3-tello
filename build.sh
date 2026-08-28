@@ -1,9 +1,11 @@
 #!/bin/bash
 set -eu
 
-git clone --filter=blob:none https://github.com/scratchfoundation/scratch-vm.git -b 0.2.0-prerelease.20220222132735
-git clone --filter=blob:none https://github.com/scratchfoundation/scratch-gui.git -b scratch-desktop-v3.29.0
-git clone --filter=blob:none https://github.com/scratchfoundation/scratch-desktop.git -b v3.29.1
+git clone --depth 1 -b 0.2.0-prerelease.20220222132735 https://github.com/scratchfoundation/scratch-vm.git
+git clone --depth 1 -b scratch-desktop-v3.29.0 https://github.com/scratchfoundation/scratch-gui.git
+git clone --depth 1 -b v3.29.1 https://github.com/scratchfoundation/scratch-desktop.git
+
+rm -rf scratch-vm/.git scratch-gui/.git scratch-desktop/.git
 
 cd scratch-vm
 npm install --legacy-peer-deps
@@ -23,6 +25,6 @@ rm -rf scratch-gui
 ln -s ../../scratch-gui scratch-gui
 cd ../../
 
-git clone https://github.com/naoji3x/scratch3-tello
+git clone --depth 1 https://github.com/naoji3x/scratch3-tello
 cp -r scratch3-tello/. ./
 rm -rf scratch3-tello/
