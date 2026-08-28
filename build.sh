@@ -22,7 +22,15 @@ cd scratch-desktop
 npm install --legacy-peer-deps
 cd node_modules
 rm -rf scratch-gui
-ln -s ../../scratch-gui scratch-gui
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    # symlinkは管理者権限/開発者モードが必要なため、権限不要なジャンクションを使う
+    cmd //c mklink /J scratch-gui "$(cd ../../scratch-gui && pwd -W)"
+    ;;
+  *)
+    ln -s ../../scratch-gui scratch-gui
+    ;;
+esac
 cd ../../
 
 git clone --depth 1 https://github.com/naoji3x/scratch3-tello
