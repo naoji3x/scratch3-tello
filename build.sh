@@ -33,7 +33,8 @@ rm -rf scratch-gui
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*)
     # symlinkは管理者権限/開発者モードが必要なため、権限不要なジャンクションを使う
-    cmd //c mklink /J scratch-gui "$(cd ../../scratch-gui && pwd -W)"
+    # MSYS_NO_PATHCONVがないとGit Bashのパス自動変換で/Jオプションが壊れてmklinkが失敗する
+    MSYS_NO_PATHCONV=1 cmd //c mklink /J scratch-gui "$(cd ../../scratch-gui && pwd -W)"
     ;;
   *)
     ln -s ../../scratch-gui scratch-gui
