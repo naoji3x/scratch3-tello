@@ -38,20 +38,15 @@ const message = {
         'lv': 'atkārtoti savienot',
         'ua': 'перепідключитися',
     },
-    videoToggle: {
-        'ja': 'カメラを [VIDEO_STATE] にする',
-        'ja-Hira': 'カメラを [VIDEO_STATE] にする',
-        'en': 'turn camera [VIDEO_STATE]',
-    },
     videoOn: {
-        'ja': 'オン',
-        'ja-Hira': 'オン',
-        'en': 'on',
+        'ja': 'カメラをオンにする',
+        'ja-Hira': 'カメラをオンにする',
+        'en': 'turn camera on',
     },
     videoOff: {
-        'ja': 'オフ',
-        'ja-Hira': 'オフ',
-        'en': 'off',
+        'ja': 'カメラをオフにする',
+        'ja-Hira': 'カメラをオフにする',
+        'en': 'turn camera off',
     },
     takePhoto: {
         'ja': '写真をとる',
@@ -159,8 +154,8 @@ const message = {
         'br': 'para direita [X] cm',
     },
     forward: {
-        'ja': '前に [X]cm 進む',
-        'ja-Hira': 'まえに [X] センチすすむ',
+        'ja': '前に [X]cm 動く',
+        'ja-Hira': 'まえに [X] センチうごく',
         'en': 'move forward [X] cm',
         'ru': 'вперёд [X] см',
         'fr': 'voler vers l\'avant [X] cm',
@@ -174,8 +169,8 @@ const message = {
         'br': 'para frente [X] cm',
     },
     back: {
-        'ja': '後ろに [X]cm 下がる',
-        'ja-Hira': 'うしろに [X] センチさがる',
+        'ja': '後ろに [X]cm 動く',
+        'ja-Hira': 'うしろに [X] センチうごく',
         'en': 'move back [X] cm',
         'ru': 'назад [X] см',
         'fr': 'voler vers l\'arrière [X] cm',
@@ -618,16 +613,14 @@ class Scratch3Tello {
                 },
                 '---',
                 {
-                    opcode: 'videoToggle',
-                    text: this._getText('videoToggle'),
-                    blockType: BlockType.COMMAND,
-                    arguments: {
-                        VIDEO_STATE: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'on',
-                            menu: 'VIDEO_STATE'
-                        }
-                    }
+                    opcode: 'videoOn',
+                    text: this._getText('videoOn'),
+                    blockType: BlockType.COMMAND
+                },
+                {
+                    opcode: 'videoOff',
+                    text: this._getText('videoOff'),
+                    blockType: BlockType.COMMAND
                 },
                 {
                     opcode: 'takePhoto',
@@ -1030,19 +1023,6 @@ class Scratch3Tello {
                 }
             ],
             menus: {
-                VIDEO_STATE: {
-                    acceptReporters: false,
-                    items: [
-                        {
-                            text: this._getText('videoOn'),
-                            value: 'on'
-                        },
-                        {
-                            text: this._getText('videoOff'),
-                            value: 'off'
-                        }
-                    ]
-                },
                 DIRECTION: {
                     acceptReporters: true,
                     items: [
@@ -1304,14 +1284,14 @@ class Scratch3Tello {
         this.telloProcessor.resetQueue();
     }
 
-    videoToggle (args) {
-        if (args.VIDEO_STATE === 'on') {
-            this.telloProcessor.request('streamon');
-            this.telloVideo.enable();
-        } else {
-            this.telloVideo.disable();
-            this.telloProcessor.request('streamoff');
-        }
+    videoOn () {
+        this.telloProcessor.request('streamon');
+        this.telloVideo.enable();
+    }
+
+    videoOff () {
+        this.telloVideo.disable();
+        this.telloProcessor.request('streamoff');
     }
 
     takePhoto () {
