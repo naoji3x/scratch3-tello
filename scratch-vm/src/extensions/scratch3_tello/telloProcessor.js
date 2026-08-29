@@ -1,5 +1,10 @@
 const dgram = require('dgram');
 
+// Tello's UDP responses are not guaranteed to arrive (this is especially true once
+// `streamon` starts saturating the Wi-Fi link with video traffic). Without a timeout,
+// a single lost response permanently stalls the command queue.
+const ACK_TIMEOUT_MS = 5000;
+
 class TelloProcessor {
     initialize () {
         this.queue = []; // command queue
@@ -27,6 +32,7 @@ class TelloProcessor {
 
             // Previous command executed
             if (readableMessage === 'ok') {
+                this._clearAckTimeout();
                 this.executing = false;
 
                 if (this.executingCommand === 'takeoff') this.flying = true;
@@ -38,8 +44,15 @@ class TelloProcessor {
                 // Send next element
                 this.inquire();
             } else if (readableMessage.includes('error')) {
+                console.warn(`[Tello] Command failed: "${this.executingCommand}" -> ${readableMessage}`);
+                this._clearAckTimeout();
                 this.executing = false;
-                this.flying = false;
+
+                // Only a failed takeoff should affect the flying state; a failure on any
+                // other command (e.g. an unsupported LED command) must not be treated as
+                // "the drone landed", or subsequent movement commands would be silently
+                // dropped for the rest of the queue.
+                if (this.executingCommand === 'takeoff') this.flying = false;
 
                 // Dequeue
                 this.queue.shift();
@@ -66,6 +79,7 @@ class TelloProcessor {
     reconnect () {
         if (this._reconnecting) return;
         this._reconnecting = true;
+        this._clearAckTimeout();
         this.resetQueue();
         this.data = {};
 
@@ -106,21 +120,44 @@ class TelloProcessor {
         const groundedAllowedCommands = ['command', 'mon', 'mdirection 2', 'takeoff', 'streamon', 'streamoff'];
         const isGroundedAllowed = groundedAllowedCommands.includes(cmd) || cmd.startsWith('EXT led');
         if (!this.flying && !isGroundedAllowed) {
+            console.warn(`[Tello] Skipping "${cmd}" because the drone is not flying`);
             this.queue.shift();
+            // Keep the queue moving: without this, any command left behind it
+            // would never be sent until an unrelated new request() call arrives.
+            this.inquire();
             return;
         }
         this.executing = true;
         this.executingCommand = cmd;
+        this._clearAckTimeout();
+        this._ackTimeout = setTimeout(() => {
+            console.warn(`[Tello] No response for "${cmd}" within ${ACK_TIMEOUT_MS}ms, skipping`);
+            this._ackTimeout = null;
+            this.executing = false;
+            this.queue.shift();
+            this.inquire();
+        }, ACK_TIMEOUT_MS);
         this.client.send(msg, 0, msg.length, 8889, '192.168.10.1', (err, bytes) => {
             if (err) {
                 console.error(`[Tello] Send error: ${err.message}`);
+                this._clearAckTimeout();
                 this.executing = false;
+                this.queue.shift();
+                this.inquire();
                 return;
             }
         });
     }
 
+    _clearAckTimeout () {
+        if (this._ackTimeout) {
+            clearTimeout(this._ackTimeout);
+            this._ackTimeout = null;
+        }
+    }
+
     resetQueue () {
+        this._clearAckTimeout();
         this.queue = [];
         this.flying = false;
         this.executing = false;
