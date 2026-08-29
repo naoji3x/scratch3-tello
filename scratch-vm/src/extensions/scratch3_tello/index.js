@@ -218,6 +218,21 @@ const message = {
         'ua': 'повернути на [X] градусів ліворуч',
         'br': 'girar [X] graus para a esquerda',
     },
+    setSpeed: {
+        'ja': 'スピードを [SPEED] cm/s にする',
+        'ja-Hira': 'スピードを [SPEED] センチ/びょう にする',
+        'en': 'set speed to [SPEED] cm/s',
+        'ru': 'установить скорость [SPEED] см/с',
+        'fr': 'régler la vitesse à [SPEED] cm/s',
+        'de': 'Geschwindigkeit auf [SPEED] cm/s einstellen',
+        'bg': 'задай скорост [SPEED] см/сек',
+        'zh-tw': '設定速度為 [SPEED] 公分/秒',
+        'zh-cn': '设置速度为 [SPEED] 厘米/秒',
+        'it': 'imposta la velocità a [SPEED] cm/s',
+        'lv': 'iestatīt ātrumu uz [SPEED] cm/s',
+        'ua': 'встановити швидкість [SPEED] см/с',
+        'br': 'definir velocidade para [SPEED] cm/s',
+    },
     flip: {
         'ja': '[DIRECTION]に宙返りする',
         'ja-Hira': '[DIRECTION]にちゅうがえりする',
@@ -755,6 +770,17 @@ class Scratch3Tello {
                         }
                     }
                 },
+                {
+                    opcode: 'setSpeed',
+                    text: this._getText('setSpeed'),
+                    blockType: BlockType.COMMAND,
+                    arguments: {
+                        SPEED: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 50
+                        }
+                    }
+                },
                 '---',
                 {
                     opcode: 'go',
@@ -1238,6 +1264,10 @@ class Scratch3Tello {
 
     flip (args) {
         this.telloProcessor.request(`flip ${args.DIRECTION}`);
+    }
+
+    setSpeed (args) {
+        this.telloProcessor.request(`speed ${Cast.toString(args.SPEED)}`);
     }
 
     go (args) {

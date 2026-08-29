@@ -1,31 +1,24 @@
-<div align="center">
-  <img src="https://user-images.githubusercontent.com/42484226/180014410-6c3868e4-f8ee-44a8-9a87-b89490061e03.png" alt="scratch3-tello Let's fly Tello with Scratch 3.0!" />
-</div>
-<div align="center">
-  <a href="https://scratch3-tello.app/"><img src="https://user-images.githubusercontent.com/42484226/180016745-629f04e3-e7d5-40f3-bfd6-bf2f594ecdf3.png" alt="for more information: click this image" /></a>
-</div>
+# scratch3-tello
 
-<img width="1238" alt="screenshot of scratch3-tello" src="https://user-images.githubusercontent.com/42484226/199463133-0e678fb1-f309-4dd6-936f-633d8105fd0d.png">
+Scratch 3.0でTelloドローンを操作できるようにする拡張機能つきアプリです。
 
-![GitHub all releases](https://img.shields.io/github/downloads/kebhr/scratch3-tello/total?style=for-the-badge)
+## リリース
 
-## Release
-You can download the binary from [here](https://github.com/kebhr/scratch3-tello/releases).  
+### 使い方
 
-I am seeking sponsors on [Patreon](https://www.patreon.com/scratch3_tello) to continue the development of Scratch3-Tello.
+1. バイナリをダウンロードします。
+2. TelloのWi-Fiに接続します。
+3. アプリを起動します。
+4. Tello拡張機能を有効化します。
 
-### Instruction
-1. Download the binary.
-2. Connect to Tello's wifi.
-3. Start the app.
-4. Activate Tello extension.
+**注意:**
 
-**NOTE:**
-- If you are having trouble connecting to Tello, close the app, restart Tello and start the app again.  
-- Connect to Tello before launching the app. If you connect to Tello after the app is launched, the extension will **not** be able to send commands to Tello.
-- If the drone does not take off after sending the `takeoff` command, use the `clear command queue` block.
+- Telloへの接続がうまくいかない場合は、アプリを終了し、Telloを再起動してからアプリを起動し直してください。
+- アプリを起動する前にTelloへ接続してください。アプリ起動後にTelloへ接続すると、拡張機能からTelloへコマンドを送信できなくなります。
+- `takeoff`コマンドを送信してもドローンが離陸しない場合は、`clear command queue`ブロックを使用してください。
 
-## Supported languages
+## 対応言語
+
 - English
 - 日本語
 - にほんご
@@ -39,21 +32,40 @@ I am seeking sponsors on [Patreon](https://www.patreon.com/scratch3_tello) to co
 - Українська (Thanks to [@MaxVolobuev](https://github.com/MaxVolobuev))
 - Português do Brasil (Thanks to [@matheusyanr](https://github.com/matheusyanr))
 
-Feel free to create a pull request for adding more languages!
+対応言語を追加するプルリクエストを歓迎します。
 
-## How to build
+## 前提条件
+
+ビルドには[Git](https://git-scm.com/)と[mise](https://mise.jdx.dev/)（Node.jsのバージョン管理ツール）が必要です。本リポジトリの[mise.toml](mise.toml)でNode.js 16.20.2を使用するよう指定しています。
+
+### macOS
+
+- Git（`brew install git`などで導入できます）
+- mise（`brew install mise`などで導入できます）
+
+### Windows
+
+- [Git for Windows](https://gitforwindows.org/)（Git Bashを含みます。以下のビルド手順はGit Bash上で実行してください）
+- [mise](https://mise.jdx.dev/)（Windows版のインストーラーを利用してください）
+
+## ビルド方法
+
+Git Bash（Windows）またはターミナル（macOS）で以下を実行します。
+
 ```bash
-$ mkdir scratch3-tello
-$ cd scratch3-tello
-$ wget https://raw.githubusercontent.com/naoji3x/scratch3-tello/master/build.sh
-$ chmod +x build.sh
-$ ./build.sh
+mkdir scratch3-tello
+cd scratch3-tello
+mise use node@16.20.2
+curl -fsSLo build.sh https://raw.githubusercontent.com/naoji3x/scratch3-tello/master/build.sh
+chmod +x build.sh
+./build.sh
 ```
 
-## How to run
+## 起動方法
+
 ```bash
-$ cd scratch-desktop
-$ npm start
+cd scratch-desktop
+npm start
 ```
 
-If you fail to load Tello extension, please run `relink.sh`.
+Tello拡張機能の読み込みに失敗する場合は、`scratch-vm`・`scratch-gui`・`scratch-desktop`ディレクトリを削除したうえで、`build.sh`をもう一度実行してください。
