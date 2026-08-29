@@ -33,6 +33,8 @@ case "$(uname -s)" in
 esac
 cd ../../
 
-git clone --depth 1 https://github.com/naoji3x/scratch3-tello
+# scratch3-tello本体は--depth 1にせず、履歴を保持したままトップレベルへ展開する。
+# これにより、build.shを実行した端末上でそのまま開発・コミット・pushができる。
+git clone https://github.com/naoji3x/scratch3-tello
 cp -r scratch3-tello/. ./
 rm -rf scratch3-tello/
