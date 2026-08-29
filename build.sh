@@ -7,6 +7,14 @@ git clone --depth 1 -b v3.29.1 https://github.com/scratchfoundation/scratch-desk
 
 rm -rf scratch-vm/.git scratch-gui/.git scratch-desktop/.git
 
+# scratch3-tello本体は--depth 1にせず、履歴を保持したままトップレベルへ展開する。
+# これにより、build.shを実行した端末上でそのまま開発・コミット・pushができる。
+# npm installより前に上書きすることで、Tello拡張が追加した依存関係
+# (ffmpeg-static, pngjsなど)がnpm installで確実にインストールされるようにする。
+git clone https://github.com/naoji3x/scratch3-tello
+cp -r scratch3-tello/. ./
+rm -rf scratch3-tello/
+
 cd scratch-vm
 npm install --legacy-peer-deps
 npm link
@@ -32,9 +40,3 @@ case "$(uname -s)" in
     ;;
 esac
 cd ../../
-
-# scratch3-tello本体は--depth 1にせず、履歴を保持したままトップレベルへ展開する。
-# これにより、build.shを実行した端末上でそのまま開発・コミット・pushができる。
-git clone https://github.com/naoji3x/scratch3-tello
-cp -r scratch3-tello/. ./
-rm -rf scratch3-tello/
